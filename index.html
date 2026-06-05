@@ -1,104 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-    <meta name="google-site-verification" content="CnDV5cYYFZiT8GGDhOsVCN6bZMaCQUehKAero3F7CUk" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snip</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 20px; background: #0a0a0a; color: white; }
-    input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; font-size: 16px; }
-    input { background: #1a1a1a; color: white; }
-    button { background: #ff0050; color: white; font-weight: bold; cursor: pointer; }
-    button:hover { opacity: 0.8; }
-    .hidden { display: none; }
-    #status { margin-top: 15px; padding: 10px; border-radius: 8px; background: #1a1a1a; word-break: break-word; }
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snip</title>
+<style>
+:root{--bg:#0b0d12;--card:#121622;--muted:#8a94a8;--text:#e8ecf5;--accent:#7c5cff;--accent2:#00d4ff;--border:#1e2433}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui}
+.app{display:grid;grid-template-columns:280px 1fr 320px;gap:24px;max-width:1300px;margin:0 auto;padding:24px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px}
+.left{position:sticky;top:24px;padding:16px;height:fit-content}
+.nav button{width:100%;text-align:left;padding:10px;margin:4px 0;background:transparent;border:0;color:var(--text);cursor:pointer;border-radius:10px}
+.nav button.active{background:#0f1320}
+textarea,input{width:100%;background:#0c101a;border:1px solid var(--border);border-radius:12px;color:var(--text);padding:10px;margin:6px 0}
+.btn{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#0f1320;color:var(--text);cursor:pointer}
+.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));border:none;font-weight:700}
+.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.post .head{display:flex;gap:10px;padding:12px;align-items:center}
+.post img.main{width:100%;max-height:600px;object-fit:cover}
+.actions{display:flex;gap:16px;padding:8px 14px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+.modal.open{display:flex}
+</style>
+<script type="importmap">{"imports":{"appwrite":"https://cdn.jsdelivr.net/npm/appwrite@16.0.2/dist/esm/sdk.js"}}</script>
 </head>
 <body>
-  <h1>Snip 2.0 🔥</h1>
-  
-  <div id="authSection">
-    <h3>Sign Up / Login</h3>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <input type="text" id="name" placeholder="Username">
-    <button id="signupBtn">Sign Up</button>
-    <button id="loginBtn">Login</button>
-    <button id="logoutBtn" class="hidden">Logout</button>
-  </div>
-
-  <div id="appSection" class="hidden">
-    <h3>Welcome <span id="userName"></span></h3>
-    <p>You're logged in! Upload feature coming next.</p>
-  </div>
-
-  <div id="status">Status: Ready</div>
-
-  <script type="module">
-    import { Client, Account, ID } from 'https://cdn.jsdelivr.net/npm/appwrite@15.0.0/+esm'
-
-    // FRA REGION ENDPOINT 👇
-    const client = new Client()
-      .setEndpoint('https://fra.cloud.appwrite.io/v1') 
-      .setProject('snip-3778');
-
-    const account = new Account(client);
-    const status = document.getElementById('status');
-
-    document.getElementById('signupBtn').onclick = async () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const name = document.getElementById('name').value;
-      status.innerText = 'Status: Creating account...';
-      
-      try {
-        await account.create(ID.unique(), email, password, name);
-        await account.createEmailPasswordSession(email, password);
-        status.innerText = 'Status: ✅ Account created + logged in!';
-      } catch (error) {
-        status.innerText = `Status: ❌ ${error.message}`;
-        console.error(error);
-      }
-    };
-
-    document.getElementById('loginBtn').onclick = async () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      status.innerText = 'Status: Logging in...';
-      
-      try {
-        await account.createEmailPasswordSession(email, password);
-        const user = await account.get();
-        status.innerText = 'Status: ✅ Logged in as ' + user.name;
-        checkAuth();
-      } catch (error) {
-        status.innerText = `Status: ❌ ${error.message}`;
-        console.error(error);
-      }
-    };
-
-    document.getElementById('logoutBtn').onclick = async () => {
-      await account.deleteSession('current');
-      status.innerText = 'Status: Logged out';
-      checkAuth();
-    };
-
-    async function checkAuth() {
-      try {
-        const user = await account.get();
-        document.getElementById('authSection').classList.add('hidden');
-        document.getElementById('appSection').classList.remove('hidden');
-        document.getElementById('logoutBtn').classList.remove('hidden');
-        document.getElementById('userName').innerText = user.name;
-      } catch (error) {
-        document.getElementById('authSection').classList.remove('hidden');
-        document.getElementById('appSection').classList.add('hidden');
-        document.getElementById('logoutBtn').classList.add('hidden');
-      }
-    }
-    
-    checkAuth();
-  </script>
-</body>
-</html>
+<div class="app">
+  <aside class="left card">
+    <h2>Snip</h2>
+    <nav class="nav"><button class="active">🏠 Feed</button><button id="authBtn">🔑 Sign In</button></nav>
+    <textarea id="text" placeholder="What's happening?"></textarea>
+    <input type="file" id="file" accept="image/*">
+    <button class="btn primary" id="postBtn">Post</button>
+  </aside>
+  <main id="feed" style="display:flex;flex-direction:column;gap:16px"></main>
+  <aside class="right card" style="padding:16px"><h3>People</h3><div id="people"></div></aside>
+</div>
+<div class="modal" id="authModal"><div class="card" style="padding:16px;max-width:400px;width:100%">
+<h3 id="authTitle">Sign In</h3>
+<input id="email" placeholder="email"><input id="password" type="password" placeholder="password">
+<input id="name" placeholder="name (sign up)" style="display:none">
+<button class="btn primary" id="authSubmit">Continue</button>
+<button class="btn" id="authClose">Close</button>
+<p id="authToggle" style="cursor:pointer;color:var(--muted)">No account? Sign up</p>
+</div></div>
+<script type="module">
+import {Client,Account,Databases,Storage,ID,Query,Permission,Role} from 'appwrite';
+const client=new Client().setEndpoint('https://fra.cloud.appwrite.io/v1').setProject(snip-3778);
+const account=new Account(client),db=new Databases(client),storage=new Storage(client);
+const DB='main',BUCKET='posts',C={posts:'posts',profiles:'profiles',likes:'likes',comments:'comments',follows:'follows',saves:'saves'};
+let me=null,mode='signin';const $=s=>document.querySelector(s);
+async function init(){try{me=await account.get();$('#authBtn').textContent='🚪 Sign Out'}catch{};loadFeed();loadPeople();
+client.subscribe(`databases.${DB}.collections.${C.posts}.documents`,e=>{if(e.events.some(x=>x.includes('create')))loadFeed()});}
+async function loadFeed(){const r=await db.listDocuments(DB,C.posts,[Query.orderDesc('createdAt'),Query.limit(30)]);
+const p=await db.listDocuments(DB,C.profiles,[Query.limit(100)]);const m=Object.fromEntries(p.documents.map(x=>[x.userId,x]));
+$('#feed').innerHTML=r.documents.map(d=>{const u=m[d.userId]||{name:'?',handle:'?',avatar:''};return `<article class="card post"><div class="head"><img class="avatar" src="${u.avatar}"><div><b>${u.name}</b><div style="color:var(--muted);font-size:12px">@${u.handle}</div></div></div>${d.imageUrl?`<img class="main" src="${d.imageUrl}">`:''}<div style="padding:12px">${d.text||''}</div><div class="actions"><span onclick="like('${d.$id}')">❤️</span><span onclick="comment('${d.$id}')">💬</span><span onclick="savePost('${d.$id}')">🔖</span></div></article>`}).join('
